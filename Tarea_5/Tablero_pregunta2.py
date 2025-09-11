@@ -15,6 +15,9 @@ df_general= df.groupby(["location", "impact"]).size().unstack(fill_value=0).rese
 df_general=df_general[df_general['location']!='?']
 df_general['total_incidentes']=df_general['1 - High']+df_general['2 - Medium']+df_general['3 - Low']
 
+
+
+
 #3.2  data frame totales
 total_high=df_general['1 - High'].sum()
 total_medium=df_general['2 - Medium'].sum()
@@ -25,6 +28,14 @@ datos_totales=[
     ['2 - Medium',total_medium],
     ['3 - Low',total_low],
 ]
+
+dict_datos_totales={
+    '1 - High':total_high,
+    '2 - Medium':total_medium,
+    '3 - Low':total_low
+}
+
+print(dict_datos_totales)
 
 df_totales=pd.DataFrame(datos_totales,columns=['Impacto','Total'])
 
@@ -89,7 +100,7 @@ app.layout = html.Div([
             style={'width':'50%'}
         ),
 
-        dcc.Graph(id='bar4')
+        dcc.Graph(id='pie2')
     ])
 
 
@@ -151,6 +162,32 @@ def update_figure(tamaño):
 
     )     
     return fig                       
+
+@app.callback(
+    Output('pie2','figure'),
+    [Input('slider1','value'),
+     Input('drop1','value')]
+)
+def update_figure(tamaño,tipo):
+    df_filtrado=df_general
+    df_filtrado=df_filtrado.sort_values(by='total_incidentes',ascending=False)
+    df_filtrado=df_filtrado.head(tamaño)
+    suma=df_filtrado[tipo].sum()
+    totales=dict_datos_totales[tipo]
+    cubierto=suma
+    p_cubierto=cubierto/totales
+    no_cubierto=1-p_cubierto
+    datos_porcentajes=[
+        ['cubierto',p_cubierto],
+        ['no cubierto',no_cubierto]
+        ]
+    df_porcentajes=pd.DataFrame(datos_porcentajes,columns=['Cobertura','Porcentajes'])
+    fig=px.pie(
+        df_porcentajes,
+        values='Porcentajes',
+        names='Cobertura'
+    )
+    return fig
 
 
 if __name__ == '__main__':
