@@ -15,7 +15,6 @@ df_general= df.groupby(["location", "impact"]).size().unstack(fill_value=0).rese
 df_general=df_general[df_general['location']!='?']
 df_general['total_incidentes']=df_general['1 - High']+df_general['2 - Medium']+df_general['3 - Low']
 
-
 #3.2  data frame totales
 total_high=df_general['1 - High'].sum()
 total_medium=df_general['2 - Medium'].sum()
@@ -64,9 +63,9 @@ app.layout = html.Div([
             id='slider1',
             min=10,
             max=50,
-            step=10,
+            step=5,
             value=10,
-            marks={10:'10',20:'20',30:'30',40:'40',50:'50'},
+            marks={10:'10',15:'15',20:'20',25:'25',30:'30',35:'35',40:'40',45:'45',50:'50'},
             
         ),
 
@@ -80,24 +79,15 @@ app.layout = html.Div([
     ]),
 
     html.Div([
+
+        dcc.Graph(id='bar3'),
+
         dcc.Dropdown(
             id='drop1',
             options=['1 - High','2 - Medium','3 - Low'],
             value='1 - High',
             style={'width':'50%'}
         ),
-
-        dcc.Slider(
-            id='slider2',
-            min=10,
-            max=50,
-            step=10,
-            value=10,
-            marks={10:'10',20:'20',30:'30',40:'40',50:'50'},
-            
-        ),
-
-        dcc.Graph(id='bar3'),
 
         dcc.Graph(id='bar4')
     ])
@@ -116,7 +106,7 @@ def update_figure(tamaño):
     fig=px.bar(
         df_filtrado,
         x='location',
-        y='total_incidentes'
+        y='total_incidentes',
     )
     return fig
 
@@ -134,7 +124,33 @@ def update_figure(tamaño):
 
     return texto
 
+@app.callback(
+    Output('bar3', 'figure'),
+    [Input('slider1', 'value')])
+def update_figure(tamaño):
+    df_filtrado=df_general
+    df_filtrado=df_filtrado.sort_values(by='total_incidentes',ascending=False)
+    df_filtrado=df_filtrado.head(tamaño)
+    esperadas = {"1 - High", "2 - Medium", "3 - Low"}
+    presentes = [c for c in df_filtrado.columns if c in esperadas]
 
+    df_largo = df_filtrado.melt(
+        id_vars=["location"],
+        value_vars=presentes,
+        var_name="impacto",
+        value_name="cantidad"
+)
+
+    fig=px.bar(
+        df_largo,
+        x='location',
+        y='cantidad',
+        barmode='stack',
+        color='impacto',
+        color_discrete_map=colores,
+
+    )     
+    return fig                       
 
 
 if __name__ == '__main__':
