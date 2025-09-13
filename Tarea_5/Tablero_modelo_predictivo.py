@@ -8,3 +8,5 @@ import plotly.express as px
 import numpy as np
 
 #2. Importar datos
+
+#3. Importar modelo
