@@ -8,5 +8,6 @@ import plotly.express as px
 import numpy as np
 
 #2. Importar datos
+df=pd.read_csv('df_limpio_1y2.csv')
 
 #3. Importar modelo
