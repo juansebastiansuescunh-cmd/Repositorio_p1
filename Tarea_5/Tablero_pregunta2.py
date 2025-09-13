@@ -36,10 +36,15 @@ dict_datos_totales={
 df_totales=pd.DataFrame(datos_totales,columns=['Impacto','Total'])
 
 colores = {
-    "1 - High": "red",
-    "2 - Medium": "blue",
-    "3 - Low": "green"
+    "1 - High": "maroon",
+    "2 - Medium": "navy",
+    "3 - Low": "seagreen"
 }
+
+colores2={
+    "cubierto": "seagreen",      
+    "no cubierto": "maroon"     
+    }
 
 bar_totales=px.bar(df_totales,x='Impacto',y='Total',color='Impacto',color_discrete_map=colores)
 pie_totales=px.pie(df_totales,names='Impacto',values='Total',color='Impacto',color_discrete_map=colores)
@@ -58,14 +63,14 @@ app.layout = html.Div([
     ]),
 
     html.Div([
-
         dcc.Graph(id='pie1',figure=pie_totales),
         dcc.Graph(id='bar1',figure=bar_totales)
+
     ],style={'display':'flex'}),
 
     html.Div([
         html.H1(children="Identificación de zonas problemáticas"),
-
+        html.P(children="Seleccione cuantas zonas desea incluir"),
         dcc.Slider(
             id='slider1',
             min=10,
@@ -130,6 +135,7 @@ def update_figure(tamaño):
         df_filtrado,
         x='location',
         y='total_incidentes',
+        color_discrete_sequence=["navy"]
     )
     return fig
 
@@ -196,7 +202,7 @@ def update_figure(tamaño,tipo):
             y="porcentaje",      
             color="impacto",
             barmode="stack",
-            color_discrete_map={"1 - High": "red", "2 - Medium": "blue", "3 - Low": "green"},
+            color_discrete_map=colores,
         )
 
     return fig                       
@@ -249,7 +255,8 @@ def update_figure(tamaño,tipo):
             values='Porcentajes',
             names='Cobertura',
             color='Cobertura',
-            title='Cobertura incidentes de impacto alto'
+            title='Cobertura incidentes de impacto alto',
+            color_discrete_map=colores2
         )
 
         fig2=px.pie(
@@ -257,7 +264,8 @@ def update_figure(tamaño,tipo):
             values='Porcentajes',
             names='Cobertura',
             color='Cobertura',
-            title='Cobertura incidentes de impacto medio'
+            title='Cobertura incidentes de impacto medio',
+            color_discrete_map=colores2
         )
 
         fig3=px.pie(
@@ -265,7 +273,8 @@ def update_figure(tamaño,tipo):
             values='Porcentajes',
             names='Cobertura',
             color='Cobertura',
-            title='Cobertura incidentes de impacto bajo'
+            title='Cobertura incidentes de impacto bajo',
+            color_discrete_map=colores2
         )
     if tipo=='Bar plot':
         cubierto_high=suma_high
@@ -300,7 +309,8 @@ def update_figure(tamaño,tipo):
             x="Cobertura",
             y="Cantidades",
             color='Cobertura',
-            title='Cobertura incidentes de impacto alto'      
+            title='Cobertura incidentes de impacto alto',
+            color_discrete_map=colores2      
         )
 
         fig2 = px.bar(
@@ -308,7 +318,8 @@ def update_figure(tamaño,tipo):
             x="Cobertura",
             y="Cantidades",
             color='Cobertura',
-            title='Cobertura incidentes de impacto medio'      
+            title='Cobertura incidentes de impacto medio',
+            color_discrete_map=colores2
         )
 
         fig3 = px.bar(
@@ -316,7 +327,8 @@ def update_figure(tamaño,tipo):
             x="Cobertura",
             y="Cantidades",
             color='Cobertura',
-            title='Cobertura incidentes de impacto bajo'      
+            title='Cobertura incidentes de impacto bajo',
+            color_discrete_map=colores2
         )
     return fig1, fig2, fig3
 
