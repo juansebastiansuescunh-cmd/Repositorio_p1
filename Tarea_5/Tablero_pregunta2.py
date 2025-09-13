@@ -16,11 +16,6 @@ df_general= df.groupby(["location", "impact"]).size().unstack(fill_value=0).rese
 df_general=df_general[df_general['location']!='?']
 df_general['total_incidentes']=df_general['1 - High']+df_general['2 - Medium']+df_general['3 - Low']
 
-df_filtrado=df_general
-df_filtrado=df_filtrado.sort_values(by='total_incidentes',ascending=False)
-df_filtrado=df_filtrado.head(10)
-print(df_filtrado)
-
 #3.2  data frame totales
 total_high=df_general['1 - High'].sum()
 total_medium=df_general['2 - Medium'].sum()
