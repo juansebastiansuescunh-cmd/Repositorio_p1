@@ -191,14 +191,15 @@ app.layout = html.Div([
 
         html.H3(children='Predecir cumplimiento'),
 
-        html.P(id='x_new')
-
+        html.P(id='x_new'),
+        dcc.Graph(id='prediccion')
     ])
 
 ])
 
 @app.callback(
-    Output('x_new', 'children'),
+    [Output('x_new', 'children'),
+     Output('prediccion','figure')],
     [Input('activo', 'value'),
      Input('reassingment_count', 'value'),
      Input('reopen_count', 'value'),
@@ -235,7 +236,20 @@ def crear_x_new(activo,rea_count,reo_count,sys_count,knowledge,u_prio,loc,cat,su
     X_new = X_new.reindex(columns=cols_model, fill_value=0.0)
     y_prob = model.predict_proba(X_new)[:, 1][0]
     y_pred = model.predict(X_new)[0]
-    return f"Prob. de cumplir SLA: {y_prob:.2%} | Predicción: {int(y_pred)}"
+
+    y_no_pred=1-y_pred
+    y_no_prob=1-y_prob
+    mapa = {1: "se cumple", 0: "no se cumple"}
+    datos_prediccion=[
+        [mapa[y_pred],y_prob],
+        [mapa[y_no_pred],y_no_prob]
+    ]
+
+    df_pred=pd.DataFrame(datos_prediccion,columns=['Cumplimiento','Probabilidad'])
+
+    fig=px.bar(df_pred,x='Cumplimiento',y='Probabilidad')
+
+    return (f"Prob. de cumplir SLA: {y_prob:.2%} | Predicción: {int(y_pred)}",fig)
 
 if __name__ == '__main__':
     app.run(debug=True)
